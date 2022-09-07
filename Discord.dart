@@ -94,6 +94,8 @@ class Discord {
         throw new NullException();
       }
       if (!username.contains(user)) {
+        print(username.toString());
+        print(users.toString());
         throw new MissingUser();
       }
       if (userStatus[user] == 0) {
@@ -239,9 +241,8 @@ class Discord {
   }
 }
 
-void WelcomeInterface() {
+void WelcomeInterface(Discord session) {
   print("Welcome to Discord, What you want to do?");
-  Discord session = new Discord();
   String? response = stdin.readLineSync();
   if (response == 'register') {
     print("Enter number of users");
@@ -304,5 +305,7 @@ void WelcomeInterface() {
 }
 
 void main(List<String> args) {
-  WelcomeInterface();
+  Discord session = new Discord();
+  WelcomeInterface(session);
+  WelcomeInterface(session);
 }
