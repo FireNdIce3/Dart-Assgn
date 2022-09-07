@@ -51,30 +51,34 @@ class Server {
 class Discord {
   late List<Server> allServers = [];
   late List<User> users = [];
-  late Map<String, int> userStatus;
+  late Map<String, int> userStatus = {};
   late List<String> types = ['text', 'voice', 'stage', 'rules', 'announcement'];
 
   void register(int n) {
     late List<User> temp = users;
+    late List<String> username = [];
+    users.forEach((element) {
+      username.add(element.name);
+    });
     for (int i = 0; i < n; i++) {
       String? user = stdin.readLineSync() ?? '';
       if (user == '') {
         throw new NullException();
       }
-      User a = new User(user);
-      users.add(a);
-      userStatus[user] = 0;
-    }
-    users.sort();
-    for (int i = 0; i < users.length - 1; i++) {
-      if (users[i].name == users[i + 1].name) {
+      if (username.contains(user)) {
         print("Failure");
         users = temp;
         return;
       }
+      User a = new User(user);
+      users.add(a);
+      username.add(user);
+      userStatus[user] = 0;
     }
 
-    print(users);
+    users.forEach((element) {
+      print(element.name);
+    });
     print("success");
   }
 
@@ -174,7 +178,7 @@ class Discord {
     users[index].isMod = true;
   }
 
-  void addChannel(String server, String category, String type) {
+  void addChannel(String server, String type, [String category = ""]) {
     late List<String> servername = [];
     allServers.forEach((element) {
       servername.add(element.name);
@@ -210,8 +214,8 @@ class Discord {
     });
   }
 
-  void sendMessage(String user, String server, String channel, String message,
-      {String type = ''}) {
+  void sendMessage(String user, String server, String type, String message,
+      [String category = '']) {
     late List<String> username = [];
     users.forEach((element) {
       username.add(element.name);
@@ -236,7 +240,67 @@ class Discord {
 }
 
 void WelcomeInterface() {
-  print("Hello World");
+  print("Welcome to Discord, What you want to do?");
+  Discord session = new Discord();
+  String? response = stdin.readLineSync();
+  if (response == 'register') {
+    print("Enter number of users");
+    int number = int.parse(stdin.readLineSync() ?? "");
+    session.register(number);
+  }
+  if (response == 'login') {
+    print("Enter number of users");
+    int number = int.parse(stdin.readLineSync() ?? "");
+    session.login(number);
+  }
+  if (response == 'logout') {
+    print("Enter number of users");
+    int number = int.parse(stdin.readLineSync() ?? "");
+    session.logout(number);
+  }
+  if (response == 'join') {
+    print("Enter the user name ");
+    String user = stdin.readLineSync() ?? "";
+    String server = stdin.readLineSync() ?? "";
+    session.join(user, server);
+  }
+  if (response == 'createc') {
+    print("Enter the server name");
+    String server = stdin.readLineSync() ?? "";
+    print("Enter the category(optional)");
+    String categoryName = stdin.readLineSync() ?? "";
+    print("Enter the type");
+    String type = stdin.readLineSync() ?? "";
+    session.addChannel(server, type, categoryName);
+  }
+  if (response == 'send') {
+    print("Enter the user name");
+    String user = stdin.readLineSync() ?? "";
+    print("Enter the server name");
+    String server = stdin.readLineSync() ?? "";
+    print("Enter the category(optional)");
+    String categoryName = stdin.readLineSync() ?? "";
+    print("Enter the type");
+    String type = stdin.readLineSync() ?? "";
+    print("Enter the message ");
+    String message = stdin.readLineSync() ?? "";
+    session.sendMessage(user, server, type, message, categoryName);
+  }
+  if (response == 'makemod') {
+    print("Enter the user name");
+    String user = stdin.readLineSync() ?? "";
+    session.makeMod(user);
+  }
+  if (response == 'print') {
+    print("Enter the server name");
+    String server = stdin.readLineSync() ?? "";
+    session.printMod(server);
+  }
+  if (response == 'category') {
+    print("Enter the server name");
+    String server = stdin.readLineSync() ?? "";
+    session.getCategory(server);
+  }
 }
 
 void main(List<String> args) {
