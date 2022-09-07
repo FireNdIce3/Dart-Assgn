@@ -210,7 +210,8 @@ class Discord {
     });
   }
 
-  void sendMessage(String user, String server, String channel, String message,{String type = ''}) {
+  void sendMessage(String user, String server, String channel, String message,
+      {String type = ''}) {
     late List<String> username = [];
     users.forEach((element) {
       username.add(element.name);
@@ -234,7 +235,9 @@ class Discord {
   }
 }
 
-void WelcomeInterface() {}
+void WelcomeInterface() {
+  print("Hello World");
+}
 
 void main(List<String> args) {
   WelcomeInterface();
