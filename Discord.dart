@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 class NullException implements Exception {
@@ -50,28 +51,29 @@ class Server {
 
 class Discord {
   late List<Server> allServers = [];
-  late List<User> users = [];
+  late List<User>users = [];
   late Map<String, int> userStatus = {};
   late List<String> types = ['text', 'voice', 'stage', 'rules', 'announcement'];
 
-  void register(int n) {
+  void register(int n, var userData) {
     late List<User> temp = users;
     late List<String> username = [];
-    users.forEach((element) {
+    this.users.forEach((element) {
       username.add(element.name);
     });
     for (int i = 0; i < n; i++) {
-      String? user = stdin.readLineSync() ?? '';
+      String user = userData[i];
       if (user == '') {
-        throw new NullException();
+        throw new NullException().toString();
       }
       if (username.contains(user)) {
         print("Failure");
         users = temp;
         return;
       }
+
       User a = new User(user);
-      users.add(a);
+      this.users.add(a);
       username.add(user);
       userStatus[user] = 0;
     }
@@ -79,52 +81,54 @@ class Discord {
     users.forEach((element) {
       print(element.name);
     });
+
+    print(users.toString());
     print("success");
   }
 
-  void login(int n) {
+  void login(int n, var userData) {
     late List<String> username = [];
     users.forEach((element) {
       username.add(element.name);
     });
 
     for (int i = 0; i < n; i++) {
-      String? user = stdin.readLineSync() ?? '';
+      String user = userData[i];
       if (user == '') {
-        throw new NullException();
+        throw new NullException().toString();
       }
       if (!username.contains(user)) {
         print(username.toString());
         print(users.toString());
-        throw new MissingUser();
+        throw new MissingUser().toString();
       }
       if (userStatus[user] == 0) {
         userStatus[user] = 1;
       } else {
-        throw new LoginException();
+        throw new LoginException().toString();
       }
       print("login success");
     }
   }
 
-  void logout(int n) {
+  void logout(int n, var userData) {
     late List<String> username = [];
     users.forEach((element) {
       username.add(element.name);
     });
 
     for (int i = 0; i < n; i++) {
-      String? user = stdin.readLineSync() ?? '';
+      String user = userData[i];
       if (user == '') {
-        throw new NullException();
+        throw new NullException().toString();
       }
       if (!username.contains(user)) {
-        throw new MissingUser();
+        throw new MissingUser().toString();
       }
       if (userStatus[user] == 1) {
         userStatus[user] = 0;
       } else {
-        throw new LogoutException();
+        throw new LogoutException().toString();
       }
       print("logout success");
     }
@@ -140,7 +144,7 @@ class Discord {
       servername.add(element.name);
     });
     if (!username.contains(user)) {
-      throw new MissingUser();
+      throw new MissingUser().toString();
     }
     int index = users.indexWhere((element) => element.name == user);
     if (servername.contains(server)) {
@@ -174,7 +178,7 @@ class Discord {
       username.add(element.name);
     });
     if (!username.contains(user)) {
-      throw new MissingUser();
+      throw new MissingUser().toString();
     }
     int index = users.indexWhere((element) => element.name == user);
     users[index].isMod = true;
@@ -186,10 +190,10 @@ class Discord {
       servername.add(element.name);
     });
     if (!servername.contains(server)) {
-      throw new MissingServer();
+      throw new MissingServer().toString();
     }
     if (!types.contains(type.toLowerCase()) && type != '') {
-      throw new IncompatibleType();
+      throw new IncompatibleType().toString();
     }
     allServers.forEach((element) {
       if (element.name == server) element.channels.add(category);
@@ -205,7 +209,7 @@ class Discord {
       });
     });
     if (!servername.contains(server)) {
-      throw new MissingServer();
+      throw new MissingServer().toString();
     }
     print("printing categories in ${server}");
     int index = allServers.indexWhere((element) => element.name == server);
@@ -227,12 +231,12 @@ class Discord {
       servername.add(element.name);
     });
     if (!username.contains(user) || !servername.contains(server)) {
-      throw Exception();
+      throw Exception().toString();
     }
     int index = users.indexWhere((element) => element.name == user);
     if (!users[index].isMod) {
       if (type != 'announcement' || type != 'text') {
-        throw new ModException();
+        throw new ModException().toString();
       } else {
         int index2 = allServers.indexWhere((element) => element.name == server);
         allServers[index2].messages.add(message);
@@ -242,70 +246,83 @@ class Discord {
 }
 
 void WelcomeInterface(Discord session) {
-  print("Welcome to Discord, What you want to do?");
-  String? response = stdin.readLineSync();
-  if (response == 'register') {
-    print("Enter number of users");
-    int number = int.parse(stdin.readLineSync() ?? "");
-    session.register(number);
-  }
-  if (response == 'login') {
-    print("Enter number of users");
-    int number = int.parse(stdin.readLineSync() ?? "");
-    session.login(number);
-  }
-  if (response == 'logout') {
-    print("Enter number of users");
-    int number = int.parse(stdin.readLineSync() ?? "");
-    session.logout(number);
-  }
-  if (response == 'join') {
-    print("Enter the user name ");
-    String user = stdin.readLineSync() ?? "";
-    String server = stdin.readLineSync() ?? "";
-    session.join(user, server);
-  }
-  if (response == 'createc') {
-    print("Enter the server name");
-    String server = stdin.readLineSync() ?? "";
-    print("Enter the category(optional)");
-    String categoryName = stdin.readLineSync() ?? "";
-    print("Enter the type");
-    String type = stdin.readLineSync() ?? "";
-    session.addChannel(server, type, categoryName);
-  }
-  if (response == 'send') {
-    print("Enter the user name");
-    String user = stdin.readLineSync() ?? "";
-    print("Enter the server name");
-    String server = stdin.readLineSync() ?? "";
-    print("Enter the category(optional)");
-    String categoryName = stdin.readLineSync() ?? "";
-    print("Enter the type");
-    String type = stdin.readLineSync() ?? "";
-    print("Enter the message ");
-    String message = stdin.readLineSync() ?? "";
-    session.sendMessage(user, server, type, message, categoryName);
-  }
-  if (response == 'makemod') {
-    print("Enter the user name");
-    String user = stdin.readLineSync() ?? "";
-    session.makeMod(user);
-  }
-  if (response == 'print') {
-    print("Enter the server name");
-    String server = stdin.readLineSync() ?? "";
-    session.printMod(server);
-  }
-  if (response == 'category') {
-    print("Enter the server name");
-    String server = stdin.readLineSync() ?? "";
-    session.getCategory(server);
+  String message = stdin.readLineSync() ?? "";
+  while (message != '') {
+    var arr = message.split(" ");
+    String response = arr[0];
+    var userData = arr.sublist(2, arr.length);
+    if (response == 'register') {
+      try {
+        int number = int.parse(arr[1]);
+        session.register(number, userData);
+      } catch (Exception) {
+        print("Please try again");
+      }
+    }
+    if (response == 'login') {
+      int number = int.parse(arr[1]);
+      session.login(number, userData);
+    }
+    if (response == 'logout') {
+      try {
+        int number = int.parse(arr[1]);
+        session.logout(number, userData);
+      } catch (Exception) {
+        print("Please try again");
+      }
+    }
+    if (response == 'join') {
+      try {
+        String user = arr[1];
+        String server = arr[2];
+        session.join(user, server);
+      } catch (Exception) {
+        print("Please try again");
+      }
+    }
+    if (response == 'createc') {
+      try {
+        String server = arr[1];
+        String categoryName = arr[2];
+        String type = arr[3];
+        session.addChannel(server, type, categoryName);
+      } catch (Exception) {
+        print("Please try again");
+      }
+    }
+    if (response == 'send') {
+      try {
+        String user = arr[1];
+        String server = arr[2];
+        String categoryName = arr[3];
+        String type = arr[4];
+        String message = '';
+        for (int i = 5; i < arr.length; i++) {
+          message = message + arr[i] + " ";
+        }
+        session.sendMessage(user, server, type, message, categoryName);
+      } catch (Exception) {
+        print("Please try again");
+      }
+    }
+    if (response == 'makemod') {
+      String user = arr[1];
+      session.makeMod(user);
+    }
+    if (response == 'print') {
+      String server = arr[1];
+      session.printMod(server);
+    }
+    if (response == 'category') {
+      String server = arr[1];
+      session.getCategory(server);
+    }
+    print("Enter another command");
+    message = stdin.readLineSync() ?? '';
   }
 }
 
 void main(List<String> args) {
   Discord session = new Discord();
-  WelcomeInterface(session);
   WelcomeInterface(session);
 }
